@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2596be">
+<title>Nova Proxy</title>
+<script src="/uv/uv.bundle.js"></script>
+<script src="/uv/uv.config.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/uv/sw.js", { scope: __uv$config.prefix });
+    });
+}
+</script>
+<link rel="stylesheet" href="example.css">
+</head>
+<body>
+<main class="nova-shell">
+    <header class="nova-topbar">
+        <div class="nova-brand">
+            <div class="nova-mark" aria-hidden="true">N</div>
+            <div class="nova-brand-text"><strong>Nova</strong><span>Proxy</span></div>
+        </div>
+        <div class="nova-status"><span class="status-dot"></span><span>Ready</span></div>
+    </header>
+
+    <section class="nova-controls">
+        <div class="nova-address-wrap">
+            <span class="address-icon" aria-hidden="true">⌕</span>
+            <input id="urlInput" type="text" autocomplete="off" spellcheck="false"
+                   placeholder="Search or enter a URL" aria-label="Search or enter a URL">
+            <button id="clearButton" class="icon-button" type="button" aria-label="Clear address bar">×</button>
+        </div>
+        <button id="searchButton" class="nova-button" type="button">
+            <span>Go</span><span class="button-arrow" aria-hidden="true">→</span>
+        </button>
+    </section>
+
+    <section class="nova-content">
+        <div class="welcome-card">
+            <div class="welcome-icon">N</div>
+            <h1>Ready when you are.</h1>
+            <p>Enter a website or search term above to start browsing.</p>
+            <div class="quick-hints"><span>Enter</span><span>Search</span></div>
+        </div>
+        <iframe id="iframeWindow" class="iframeWindow" title="Nova Proxy browsing window" allow="fullscreen"></iframe>
+    </section>
+</main>
+<script src="example.js"></script>
+</body>
+</html>
