@@ -106,7 +106,9 @@ function compareTasks(a, b) {
   const dateB = b.dueDate || '9999-12-31';
   if (dateA !== dateB) return dateA.localeCompare(dateB);
   const rank = { urgent: 0, high: 1, normal: 2, low: 3 };
-  return (rank[a.priority] || 2) - (rank[b.priority] || 2);
+  const rankA = typeof rank[a.priority] === 'number' ? rank[a.priority] : 2;
+  const rankB = typeof rank[b.priority] === 'number' ? rank[b.priority] : 2;
+  return rankA - rankB;
 }
 
 function taskHTML(task) {
@@ -216,7 +218,7 @@ function renderFlashcards() {
     const card = state.cards[reviewIndex];
     const face = cardRevealed ? card.back : card.front;
     stage.innerHTML = '<div class="flashcard-label">' + (cardRevealed ? 'ANSWER' : 'QUESTION') + '</div><div class="flashcard-text">' + escapeHTML(face) + '</div><div class="flashcard-hint">' + (cardRevealed ? 'Choose how well you know this one.' : 'Select the card or use Reveal answer.') + '</div>';
-    stage.setAttribute('aria-label', (cardRevealed ? 'Answer: ' : 'Question: ') + card.front);
+    stage.setAttribute('aria-label', (cardRevealed ? 'Answer: ' + card.back : 'Question: ' + card.front));
     $('#cardCounter').textContent = 'Card ' + (reviewIndex + 1) + ' of ' + count + ' · Mastery ' + (Number(card.mastery) || 0) + '/5';
     $('#reviewCardSubject').textContent = subjectLabel(card.subject);
   }
@@ -269,6 +271,7 @@ function renderFocus() {
   $('#miniTimerDisplay').textContent = formatClock(remaining);
   $('#timerModeLabel').textContent = state.timer.mode === 'break' ? 'Break time' : 'Focus session';
   $('#miniTimerMode').textContent = state.timer.mode === 'break' ? 'On a break' : 'Ready to focus';
+  $('#miniTimerStart').textContent = state.timer.running ? 'View session' : (state.timer.mode === 'break' ? 'Start break' : 'Start focus');
   $('#timerRing').style.setProperty('--timer-progress', progress + '%');
   $('#miniTimerRing').style.setProperty('--timer-progress', progress + '%');
   $('#focusStart').textContent = state.timer.running ? 'Pause timer' : (state.timer.mode === 'break' ? 'Start break' : 'Start focus');
@@ -523,7 +526,7 @@ $('#taskForm').addEventListener('submit', function (event) {
   showToast('Task added.');
 });
 
-$('#taskList').addEventListener('change', function (event) {
+function handleTaskToggle(event) {
   const input = event.target.closest('[data-action="toggle-task"]');
   if (!input) return;
   const task = state.tasks.find(function (item) { return item.id === input.dataset.id; });
@@ -533,7 +536,9 @@ $('#taskList').addEventListener('change', function (event) {
   saveState();
   renderAll();
   showToast(task.done ? 'Task completed.' : 'Task reopened.');
-});
+}
+$('#taskList').addEventListener('change', handleTaskToggle);
+$('#dashboardTaskList').addEventListener('change', handleTaskToggle);
 
 function handleTaskAction(event) {
   const button = event.target.closest('[data-action]');
