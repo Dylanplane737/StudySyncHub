@@ -1,261 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1119">
-  <meta name="description" content="A calmer study space for tasks, notes, flashcards, and focus sessions.">
-  <title>StudySync Hub — Your study space</title>
-  <link rel="stylesheet" href="study.css">
-  <script src="study.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2596be">
+<title>Nova Proxy</title>
+<script src="/uv/uv.bundle.js"></script>
+<script src="/uv/uv.config.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/uv/sw.js", { scope: __uv$config.prefix });
+    });
+}
+</script>
+<link rel="stylesheet" href="example.css">
 </head>
-<body data-theme="dark">
-  <div class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" href="#overview" aria-label="StudySync Hub home" data-view="overview">
-        <span class="brand-mark" aria-hidden="true">SS</span>
-        <span><span class="brand-name">StudySync Hub</span><span class="brand-caption">Your study space</span></span>
-      </a>
-      <div class="sidebar-label">WORKSPACE</div>
-      <nav class="nav-links" aria-label="Main navigation">
-        <button class="nav-link active" type="button" data-view="overview" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span>Overview</button>
-        <button class="nav-link" type="button" data-view="tasks"><span class="nav-icon" aria-hidden="true">✓</span>Tasks</button>
-        <button class="nav-link" type="button" data-view="cards"><span class="nav-icon" aria-hidden="true">▤</span>Flashcards</button>
-        <button class="nav-link" type="button" data-view="notes"><span class="nav-icon" aria-hidden="true">✎</span>Notes</button>
-        <button class="nav-link" type="button" data-view="focus"><span class="nav-icon" aria-hidden="true">◷</span>Focus timer</button>
-        <button class="nav-link" type="button" data-view="settings"><span class="nav-icon" aria-hidden="true">⚙</span>Settings</button>
-      </nav>
-      <div class="sidebar-spacer"></div>
-      <section class="sidebar-target" aria-label="Daily focus goal">
-        <div class="sidebar-target-top"><span>DAILY FOCUS GOAL</span><strong><span id="sidebarFocusMinutes">0</span>/<span id="sidebarTargetMinutes">60</span>m</strong></div>
-        <div class="mini-track" role="progressbar" aria-label="Daily focus goal progress" aria-valuemin="0" aria-valuemax="100"><span id="sidebarProgress"></span></div>
-      </section>
-      <div class="sidebar-footer">
-        <span class="avatar" aria-hidden="true">S</span>
-        <div><strong>My study space</strong><small>Saved on this device</small></div>
-      </div>
-    </aside>
-
-    <main class="main-content">
-      <header class="topbar">
-        <div class="topbar-heading">
-          <p class="eyebrow" id="pageEyebrow">YOUR WORKSPACE</p>
-          <h1 id="pageTitle">Overview</h1>
+<body>
+<main class="nova-shell">
+    <header class="nova-topbar">
+        <div class="nova-brand">
+            <div class="nova-mark" aria-hidden="true">N</div>
+            <div class="nova-brand-text"><strong>Nova</strong><span>Proxy</span></div>
         </div>
-        <div class="topbar-actions">
-          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="globalSearch" type="search" placeholder="Search tasks and notes" aria-label="Search tasks and notes"></label>
-          <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch theme" title="Switch theme">☼</button>
-          <button class="button ghost" id="exportQuick" type="button">Export</button>
+        <div class="nova-status"><span class="status-dot"></span><span>Ready</span></div>
+    </header>
+
+    <section class="nova-controls">
+        <div class="nova-address-wrap">
+            <span class="address-icon" aria-hidden="true">⌕</span>
+            <input id="urlInput" type="text" autocomplete="off" spellcheck="false"
+                   placeholder="Search or enter a URL" aria-label="Search or enter a URL">
+            <button id="clearButton" class="icon-button" type="button" aria-label="Clear address bar">×</button>
         </div>
-      </header>
+        <button id="searchButton" class="nova-button" type="button">
+            <span>Go</span><span class="button-arrow" aria-hidden="true">→</span>
+        </button>
+    </section>
 
-      <div class="main-scroll">
-        <section class="page active" data-page="overview" aria-labelledby="pageTitle">
-          <div class="welcome-banner">
-            <div class="welcome-copy">
-              <p class="eyebrow" id="welcomeDate">YOUR NEXT STEP STARTS HERE</p>
-              <h2>Make room to learn.</h2>
-              <p>Keep assignments, revision notes, flashcards, and focus sessions in one calm workspace. Start with one small step.</p>
-              <div class="welcome-actions">
-                <button class="button primary" type="button" data-jump="tasks">＋ Add a task</button>
-                <button class="button" type="button" data-jump="focus">Start a focus session <span aria-hidden="true">→</span></button>
-              </div>
-            </div>
-            <div class="welcome-side">
-              <span class="tiny-label">FOCUS TODAY</span>
-              <strong id="dashboardMinutes">0 min</strong>
-              <p>Every session counts.</p>
-            </div>
-          </div>
-
-          <div class="stats-grid">
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true">✓</span>
-              <div><p class="stat-label">Open tasks</p><strong class="stat-value" id="statOpenTasks">0</strong><div class="stat-foot" id="statTaskHint">No tasks added yet</div></div>
-            </article>
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true">◷</span>
-              <div><p class="stat-label">Focus minutes</p><strong class="stat-value"><span id="statFocusMinutes">0</span></strong><div class="stat-foot" id="statFocusHint">Your focus time appears here</div></div>
-            </article>
-            <article class="stat-card">
-              <span class="stat-icon" aria-hidden="true">▤</span>
-              <div><p class="stat-label">Flashcards</p><strong class="stat-value" id="statCards">0</strong><div class="stat-foot" id="statCardsHint">Build a set for your next quiz</div></div>
-            </article>
-          </div>
-
-          <div class="dashboard-grid">
-            <section class="panel">
-              <div class="panel-heading">
-                <div><h2>Task progress</h2><p>One clear next step beats a long to-do list.</p></div>
-                <button class="text-button" type="button" data-jump="tasks">View tasks →</button>
-              </div>
-              <div class="progress-summary"><span id="dashboardTaskProgressText">0 of 0 tasks complete</span><strong id="dashboardTaskPercent">0%</strong></div>
-              <div class="progress-track" role="progressbar" aria-label="All task completion" aria-valuemin="0" aria-valuemax="100"><span id="dashboardTaskProgress"></span></div>
-              <div class="panel-heading" style="margin-top:21px;margin-bottom:12px"><div><h2>Up next</h2></div><span class="panel-subtitle" id="dashboardOpenCount">0 open · 0 total</span></div>
-              <div class="task-list" id="dashboardTaskList"><div class="empty-state"><strong>Loading tasks…</strong></div></div>
-            </section>
-            <div>
-              <section class="panel">
-                <div class="panel-heading"><div><h2>Focus timer</h2><p>A little uninterrupted time goes a long way.</p></div><button class="text-button" type="button" data-jump="focus">Open →</button></div>
-                <div class="focus-mini">
-                  <div class="timer-mini" id="miniTimerRing"><div class="timer-mini-inner" id="miniTimerDisplay">25:00</div></div>
-                  <div class="focus-mini-info"><strong id="miniTimerMode">Ready to focus</strong><p>Focus minutes today: <span id="focusTodayMini">0</span></p><button class="button primary" id="miniTimerStart" type="button">Start focus</button></div>
-                </div>
-              </section>
-              <section class="panel">
-                <div class="panel-heading"><div><h2>Quick launch</h2><p>Jump straight into your next activity.</p></div></div>
-                <div class="quick-actions">
-                  <button class="quick-action" type="button" data-jump="cards"><span class="quick-symbol" aria-hidden="true">▤</span><span><strong>Review cards</strong><small id="dashboardCardSummary">Build your first set</small></span></button>
-                  <button class="quick-action" type="button" data-jump="notes"><span class="quick-symbol" aria-hidden="true">✎</span><span><strong>Write a note</strong><small>Capture what you learned</small></span></button>
-                  <button class="quick-action" type="button" data-jump="tasks"><span class="quick-symbol" aria-hidden="true">✓</span><span><strong>Plan your work</strong><small>Track what is due</small></span></button>
-                  <button class="quick-action" type="button" data-jump="settings"><span class="quick-symbol" aria-hidden="true">⚙</span><span><strong>Personalize</strong><small>Theme and timer goals</small></span></button>
-                </div>
-              </section>
-            </div>
-          </div>
-        </section>
-
-        <section class="page" data-page="tasks" aria-labelledby="pageTitle">
-          <div class="section-intro"><div><h2>Your task list</h2><p>Add assignments, choose priorities, and check them off as you finish.</p></div></div>
-          <div class="tasks-layout">
-            <section class="panel task-form-panel">
-              <div class="panel-heading"><div><h2>Add a task</h2><p>Keep the next action clear.</p></div></div>
-              <form class="form-stack" id="taskForm">
-                <div class="field"><label for="taskTitle">Task name</label><input id="taskTitle" name="title" maxlength="120" placeholder="e.g. Review geometry proofs" required></div>
-                <div class="field-row">
-                  <div class="field"><label for="taskSubject">Subject</label><select id="taskSubject"><option>General</option><option>Geometry</option><option>AP Human Geography</option><option>Spanish</option><option>Reading</option><option>Science</option><option>Other</option></select></div>
-                  <div class="field"><label for="taskDueDate">Due date</label><input id="taskDueDate" type="date"></div>
-                </div>
-                <div class="field"><label for="taskPriority">Priority</label><select id="taskPriority"><option value="normal">Normal</option><option value="low">Low</option><option value="high">High</option><option value="urgent">Urgent</option></select></div>
-                <div class="field"><label for="taskDetails">Details (optional)</label><textarea id="taskDetails" maxlength="800" placeholder="What do you need to finish?"></textarea></div>
-                <button class="button primary" type="submit">＋ Add task</button>
-              </form>
-            </section>
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Assignments</h2><p>Filter your list and update it as you go.</p></div><span class="panel-subtitle" id="taskListCount">0 open · 0 total</span></div>
-              <div class="filter-row" id="taskFilters" aria-label="Filter tasks">
-                <button type="button" class="filter-chip active" data-filter="all" aria-pressed="true">All tasks</button>
-                <button type="button" class="filter-chip" data-filter="active" aria-pressed="false">Open</button>
-                <button type="button" class="filter-chip" data-filter="done" aria-pressed="false">Completed</button>
-              </div>
-              <div class="task-list" id="taskList"><div class="empty-state"><strong>Loading tasks…</strong></div></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="page" data-page="cards" aria-labelledby="pageTitle">
-          <div class="section-intro"><div><h2>Remember more, reread less.</h2><p>Make your own question-and-answer cards and practice active recall.</p></div><span class="panel-subtitle" id="cardCountLabel">0 cards saved</span></div>
-          <div class="cards-layout">
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Create a flashcard</h2><p>Keep each answer focused on one idea.</p></div></div>
-              <form class="form-stack" id="cardForm">
-                <div class="field"><label for="cardSubject">Subject</label><select id="cardSubject"><option>General</option><option>Geometry</option><option>AP Human Geography</option><option>Spanish</option><option>Reading</option><option>Science</option><option>Other</option></select></div>
-                <div class="field"><label for="cardFrontInput">Question or prompt</label><textarea id="cardFrontInput" maxlength="1000" placeholder="What do you want to remember?" required></textarea></div>
-                <div class="field"><label for="cardBackInput">Answer</label><textarea id="cardBackInput" maxlength="1600" placeholder="Write the answer in your own words." required></textarea></div>
-                <button class="button primary" type="submit">＋ Add flashcard</button>
-              </form>
-              <div class="local-notice">Tip: try answering before revealing the back. That helps you test what you actually remember.</div>
-            </section>
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Review deck</h2><p id="reviewCardSubject">Ready to learn</p></div><span class="panel-subtitle" id="cardCounter">0 cards</span></div>
-              <div class="flashcard-stage" id="flashcardStage" role="button" tabindex="0" aria-label="Flashcard review area"><div class="empty-state"><strong>No flashcards yet</strong><p>Add your first card to get started.</p></div></div>
-              <div class="flashcard-controls">
-                <button class="button" id="cardPrev" type="button" disabled>← Previous</button>
-                <button class="button primary" id="cardReveal" type="button" disabled>Reveal answer</button>
-                <button class="button" id="cardNext" type="button" disabled>Next →</button>
-              </div>
-              <div class="flashcard-controls">
-                <button class="button" id="cardAgain" type="button" disabled>Needs practice</button>
-                <button class="button primary" id="cardKnow" type="button" disabled>I know this</button>
-              </div>
-              <div class="flashcard-count">Mastery progress: <strong id="cardMasteryCount">0</strong> total points across your cards</div>
-              <div id="flashcardDeck" class="note-list" style="margin-top:18px"></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="page" data-page="notes" aria-labelledby="pageTitle">
-          <div class="section-intro"><div><h2>Your notes</h2><p>Save concise explanations, class reminders, and revision summaries.</p></div><span class="panel-subtitle" id="noteCountLabel">0 notes</span></div>
-          <div class="notes-layout">
-            <section class="panel task-form-panel">
-              <div class="panel-heading"><div><h2>Write a note</h2><p>Keep useful information close by.</p></div></div>
-              <form class="form-stack" id="noteForm">
-                <input id="noteEditingId" type="hidden" value="">
-                <div class="field"><label for="noteTitle">Title</label><input id="noteTitle" maxlength="120" placeholder="e.g. Types of map projections" required></div>
-                <div class="field"><label for="noteSubject">Subject</label><select id="noteSubject"><option>General</option><option>Geometry</option><option>AP Human Geography</option><option>Spanish</option><option>Reading</option><option>Science</option><option>Other</option></select></div>
-                <div class="field"><label for="noteBody">Note</label><textarea id="noteBody" maxlength="10000" placeholder="Write a summary or key points…" required></textarea></div>
-                <button class="button primary" id="saveNoteButton" type="submit">Save note</button>
-                <button class="button ghost hidden" id="cancelEditNote" type="button">Cancel editing</button>
-              </form>
-            </section>
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Saved notes</h2><p>Use the search field above to find matching notes.</p></div></div>
-              <div class="note-list" id="noteList"><div class="empty-state"><strong>No notes saved yet</strong><p>Your notes will appear here.</p></div></div>
-            </section>
-          </div>
-        </section>
-
-        <section class="page" data-page="focus" aria-labelledby="pageTitle">
-          <div class="section-intro"><div><h2>Protect your focus.</h2><p>Use a timer to work in one clear block, then take a real break.</p></div></div>
-          <div class="focus-layout">
-            <section class="panel focus-main-panel">
-              <p class="eyebrow">YOUR CURRENT SESSION</p>
-              <div class="timer-ring" id="timerRing"><div class="timer-ring-inner"><span class="timer-mode" id="timerModeLabel">Focus session</span><strong class="timer-display" id="timerDisplay">25:00</strong></div></div>
-              <p class="timer-help" id="timerInstruction">Pick one task, silence distractions, and work until the timer ends.</p>
-              <div class="timer-controls">
-                <button class="button primary" id="focusStart" type="button">Start focus</button>
-                <button class="button" id="focusReset" type="button">Reset</button>
-                <button class="button ghost" id="focusModeToggle" type="button">Switch to break</button>
-              </div>
-            </section>
-            <div>
-              <section class="panel">
-                <div class="panel-heading"><div><h2>Today’s activity</h2><p>Your completed focus sessions.</p></div></div>
-                <div class="session-stats">
-                  <div class="session-stat"><strong id="focusSessionMinutes">0</strong><span>Minutes logged</span></div>
-                  <div class="session-stat"><strong id="focusSessionCount">0</strong><span>Sessions completed</span></div>
-                </div>
-              </section>
-              <section class="panel">
-                <div class="panel-heading"><div><h2>Make it manageable</h2><p>A simple routine that leaves room for real life.</p></div></div>
-                <div class="task-list">
-                  <div class="task-item"><span class="stat-icon" aria-hidden="true">1</span><div class="task-main"><div class="task-title">Pick one task</div><div class="task-subline">Decide what “finished” means.</div></div></div>
-                  <div class="task-item"><span class="stat-icon" aria-hidden="true">2</span><div class="task-main"><div class="task-title">Work until the timer ends</div><div class="task-subline">Pause whenever you need to.</div></div></div>
-                  <div class="task-item"><span class="stat-icon" aria-hidden="true">3</span><div class="task-main"><div class="task-title">Take a break</div><div class="task-subline">Then choose your next step.</div></div></div>
-                </div>
-              </section>
-            </div>
-          </div>
-        </section>
-
-        <section class="page" data-page="settings" aria-labelledby="pageTitle">
-          <div class="section-intro"><div><h2>Set up your study space.</h2><p>Adjust your timers and keep a portable backup of your work.</p></div></div>
-          <div class="settings-grid">
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Focus preferences</h2><p>Choose session lengths that work for you.</p></div></div>
-              <form class="form-stack" id="settingsForm">
-                <div class="settings-row"><div><strong>Focus length</strong><p>Each work session (5–90 min)</p></div><div class="settings-field"><input id="focusMinutesSetting" type="number" min="5" max="90" step="1" value="25" aria-label="Focus session minutes" required></div></div>
-                <div class="settings-row"><div><strong>Break length</strong><p>Between sessions (1–30 min)</p></div><div class="settings-field"><input id="breakMinutesSetting" type="number" min="1" max="30" step="1" value="5" aria-label="Break minutes" required></div></div>
-                <div class="settings-row"><div><strong>Daily focus goal</strong><p>Total minutes per day (15–600)</p></div><div class="settings-field"><input id="dailyTargetSetting" type="number" min="15" max="600" step="5" value="60" aria-label="Daily focus goal in minutes" required></div></div>
-                <div class="setting-actions"><button class="button primary" type="submit">Save settings</button><button class="button" type="button" id="themeSetting">Switch to light theme</button></div>
-              </form>
-            </section>
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Your data</h2><p>Bring your study space to another browser.</p></div></div>
-              <div class="settings-row"><div><strong>Export backup</strong><p>Download tasks, notes, cards, and focus history.</p></div><button class="button small" id="exportData" type="button">Export JSON</button></div>
-              <div class="settings-row"><div><strong>Import backup</strong><p>Replace this browser’s data from a StudySync backup.</p></div><label class="button small" for="importFile">Choose file</label><input id="importFile" class="sr-only" type="file" accept="application/json,.json"></div>
-              <div class="local-notice">Everything stays in this browser. There is no account, cloud sync, ad tracking, or external AI service.</div>
-            </section>
-            <section class="panel">
-              <div class="panel-heading"><div><h2>Reset local data</h2><p>Use this only when you want to start fresh.</p></div></div>
-              <p class="panel-subtitle" style="line-height:1.7">This removes the tasks, flashcards, notes, and focus history stored by StudySync Hub in this browser. Export a backup first if you want to keep them.</p>
-              <div class="setting-actions"><button class="button danger" id="resetAllData" type="button">Clear all study data</button></div>
-            </section>
-          </div>
-        </section>
-      </div>
-    </main>
-  </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <section class="nova-content">
+        <div class="welcome-card">
+            <div class="welcome-icon">N</div>
+            <h1>Ready when you are.</h1>
+            <p>Enter a website or search term above to start browsing.</p>
+            <div class="quick-hints"><span>Enter</span><span>Search</span></div>
+        </div>
+        <iframe id="iframeWindow" class="iframeWindow" title="Nova Proxy browsing window" allow="fullscreen"></iframe>
+    </section>
+</main>
+<script src="example.js"></script>
 </body>
 </html>
