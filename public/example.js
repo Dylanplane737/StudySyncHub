@@ -210,7 +210,9 @@
       urlInput.focus();
       return;
     }
-    if (!window.__uv$config || typeof window.__uv$config.encodeUrl !== 'function') {
+    let uvConfig;
+    try { uvConfig = __uv$config; } catch (_) { uvConfig = null; }
+    if (!uvConfig || typeof uvConfig.encodeUrl !== 'function' || !uvConfig.prefix) {
       showToast('The proxy client has not loaded yet. Refresh and try again.');
       setStatus('Proxy client unavailable', false);
       return;
@@ -226,7 +228,7 @@
     setStatus('Opening ' + shortHost(destination) + '…', true);
 
     try {
-      iframeWindow.src = window.__uv$config.prefix + window.__uv$config.encodeUrl(destination);
+      iframeWindow.src = uvConfig.prefix + uvConfig.encodeUrl(destination);
     } catch (error) {
       setStatus('Could not open this destination', false);
       showToast('The proxy could not open that address.');
@@ -290,11 +292,6 @@
   addressForm.addEventListener('submit', (event) => {
     event.preventDefault();
     navigate(urlInput.value);
-  });
-
-  searchButton.addEventListener('click', (event) => {
-    // The form owns navigation; this handles browsers that dispatch only click.
-    if (event.detail === 0) return;
   });
 
   clearButton.addEventListener('click', () => {
