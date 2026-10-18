@@ -3,51 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2596be">
+<meta name="theme-color" content="#101b2a">
+<meta name="description" content="Nova Proxy — a simple web proxy with bookmarks and local browsing history.">
 <title>Nova Proxy</title>
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
 <script>
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/uv/sw.js", { scope: __uv$config.prefix });
-    });
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/uv/sw.js", { scope: __uv$config.prefix });
+  });
 }
 </script>
 <link rel="stylesheet" href="example.css">
+<script src="example.js" defer></script>
 </head>
 <body>
-<main class="nova-shell">
-    <header class="nova-topbar">
-        <div class="nova-brand">
-            <div class="nova-mark" aria-hidden="true">N</div>
-            <div class="nova-brand-text"><strong>Nova</strong><span>Proxy</span></div>
-        </div>
-        <div class="nova-status"><span class="status-dot"></span><span>Ready</span></div>
-    </header>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="#" id="brandHome" aria-label="Nova Proxy home">
+      <span class="brand-mark" aria-hidden="true">N</span>
+      <span class="brand-copy"><strong>Nova</strong><small>PROXY BROWSER</small></span>
+    </a>
+    <div class="session-pill"><span class="status-dot"></span><span id="proxyStatus">Proxy ready</span></div>
+    <div class="topbar-actions">
+      <button class="toolbar-icon" id="themeButton" type="button" title="Switch theme" aria-label="Switch theme">☼</button>
+      <button class="toolbar-icon" id="fullscreenButton" type="button" title="Fullscreen browsing" aria-label="Fullscreen browsing">⛶</button>
+    </div>
+  </header>
 
-    <section class="nova-controls">
-        <div class="nova-address-wrap">
-            <span class="address-icon" aria-hidden="true">⌕</span>
-            <input id="urlInput" type="text" autocomplete="off" spellcheck="false"
-                   placeholder="Search or enter a URL" aria-label="Search or enter a URL">
-            <button id="clearButton" class="icon-button" type="button" aria-label="Clear address bar">×</button>
-        </div>
-        <button id="searchButton" class="nova-button" type="button">
-            <span>Go</span><span class="button-arrow" aria-hidden="true">→</span>
-        </button>
-    </section>
+  <section class="browser-toolbar" aria-label="Browser controls">
+    <div class="nav-controls">
+      <button class="toolbar-icon" id="backButton" type="button" title="Back" aria-label="Go back">←</button>
+      <button class="toolbar-icon" id="forwardButton" type="button" title="Forward" aria-label="Go forward">→</button>
+      <button class="toolbar-icon" id="reloadButton" type="button" title="Reload" aria-label="Reload page">↻</button>
+      <button class="toolbar-icon" id="homeButton" type="button" title="Home" aria-label="Return to home">⌂</button>
+    </div>
+    <form class="address-form" id="addressForm" autocomplete="off">
+      <span class="address-lock" aria-hidden="true">⌕</span>
+      <input id="urlInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+        placeholder="Search the web or enter a URL…" aria-label="Search the web or enter a URL">
+      <button class="clear-address" id="clearButton" type="button" aria-label="Clear address" title="Clear">×</button>
+      <button class="bookmark-current" id="bookmarkButton" type="button" title="Bookmark this page" aria-label="Bookmark this page">☆</button>
+    </form>
+    <label class="engine-picker">
+      <span class="sr-only">Search engine</span>
+      <select id="searchEngine" aria-label="Search engine">
+        <option value="google">Google</option>
+        <option value="duckduckgo">DuckDuckGo</option>
+        <option value="bing">Bing</option>
+      </select>
+    </label>
+    <button class="go-button" id="searchButton" type="submit" form="addressForm"><span>Go</span><span aria-hidden="true">↗</span></button>
+  </section>
 
-    <section class="nova-content">
-        <div class="welcome-card">
-            <div class="welcome-icon">N</div>
-            <h1>Ready when you are.</h1>
-            <p>Enter a website or search term above to start browsing.</p>
-            <div class="quick-hints"><span>Enter</span><span>Search</span></div>
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-heading"><span>QUICK LINKS</span></div>
+        <button class="sidebar-link" type="button" data-url="https://www.wikipedia.org/"><span class="link-symbol wiki">W</span><span>Wikipedia</span><span class="open-mark">↗</span></button>
+        <button class="sidebar-link" type="button" data-url="https://duckduckgo.com/"><span class="link-symbol duck">D</span><span>DuckDuckGo</span><span class="open-mark">↗</span></button>
+        <button class="sidebar-link" type="button" data-url="https://www.youtube.com/"><span class="link-symbol tube">▶</span><span>YouTube</span><span class="open-mark">↗</span></button>
+        <button class="sidebar-link" type="button" data-url="https://www.archive.org/"><span class="link-symbol archive">A</span><span>Internet Archive</span><span class="open-mark">↗</span></button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-heading"><span>BOOKMARKS</span><button type="button" class="tiny-action" id="clearBookmarksButton">Clear</button></div>
+        <div id="bookmarkList" class="sidebar-list">
+          <p class="sidebar-empty">Pages you save will appear here.</p>
         </div>
-        <iframe id="iframeWindow" class="iframeWindow" title="Nova Proxy browsing window" allow="fullscreen"></iframe>
-    </section>
-</main>
-<script src="example.js"></script>
+      </div>
+      <div class="sidebar-section history-section">
+        <div class="sidebar-heading"><span>RECENT</span><button type="button" class="tiny-action" id="clearHistoryButton">Clear</button></div>
+        <div id="historyList" class="sidebar-list">
+          <p class="sidebar-empty">Your recent pages will appear here.</p>
+        </div>
+      </div>
+      <div class="sidebar-bottom"><span class="privacy-icon" aria-hidden="true">◈</span><span>Bookmarks and recent pages stay in this browser.</span></div>
+    </aside>
+
+    <main class="browser-main">
+      <section id="homeView" class="home-view">
+        <div class="hero-panel">
+          <div class="hero-copy">
+            <div class="hero-eyebrow"><span class="eyebrow-line"></span> YOUR WEB, YOUR WORKSPACE</div>
+            <h1>A clearer way<br>to <span>browse.</span></h1>
+            <p>Enter a web address or a search term above. Keep the pages you use most close at hand.</p>
+            <div class="hero-chips"><span><i></i> Ultraviolet powered</span><span>Local bookmarks</span><span>Simple by design</span></div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orb orb-one"></div><div class="orb orb-two"></div>
+            <div class="art-window"><div class="art-window-top"><i></i><i></i><i></i><span></span></div><div class="art-window-content"><b></b><b></b><b></b><div></div></div></div>
+            <div class="art-spark spark-one">✦</div><div class="art-spark spark-two">+</div>
+          </div>
+        </div>
+
+        <section class="quick-section">
+          <div class="section-title"><div><h2>Jump back in</h2><p>Open a starting point in one click.</p></div></div>
+          <div class="quick-grid">
+            <button class="quick-card" type="button" data-url="https://www.wikipedia.org/"><span class="quick-card-icon wikipedia-icon">W</span><span><strong>Wikipedia</strong><small>Explore and learn</small></span><span class="card-arrow">↗</span></button>
+            <button class="quick-card" type="button" data-url="https://duckduckgo.com/"><span class="quick-card-icon duck-icon">D</span><span><strong>DuckDuckGo</strong><small>Search the web</small></span><span class="card-arrow">↗</span></button>
+            <button class="quick-card" type="button" data-url="https://www.youtube.com/"><span class="quick-card-icon video-icon">▶</span><span><strong>YouTube</strong><small>Watch videos</small></span><span class="card-arrow">↗</span></button>
+            <button class="quick-card" type="button" data-url="https://www.archive.org/"><span class="quick-card-icon archive-icon">A</span><span><strong>Internet Archive</strong><small>Browse digital history</small></span><span class="card-arrow">↗</span></button>
+          </div>
+        </section>
+
+        <section class="recent-home-section">
+          <div class="section-title"><div><h2>Recently visited</h2><p>Your latest pages, saved only on this device.</p></div><button type="button" id="viewHistoryButton" class="subtle-button">Manage history →</button></div>
+          <div id="homeHistory" class="home-history"><div class="home-empty"><span>↻</span><strong>No pages yet</strong><small>Your recent pages will show up here after you browse.</small></div></div>
+        </section>
+        <footer class="home-footer"><span class="footer-brand">NOVA <b>PROXY</b></span><span>Keep it simple. Keep moving.</span></footer>
+      </section>
+
+      <section id="browserView" class="browser-view" aria-label="Proxied browsing area">
+        <div class="frame-caption"><span class="frame-caption-dot"></span><span id="pageCaption">Current page</span><button id="openHomeFromFrame" class="text-tool" type="button">Home</button></div>
+        <iframe id="iframeWindow" title="Nova Proxy browsing window" allow="fullscreen; autoplay; clipboard-read; clipboard-write"></iframe>
+      </section>
+    </main>
+  </div>
+  <footer class="statusbar"><span class="status-left"><i></i><span id="statusMessage">Ready for a new destination</span></span><span class="status-right"><span id="currentHost">LOCAL SESSION</span><span class="status-divider"></span><span>Nova Proxy</span></span></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
