@@ -20,12 +20,14 @@ let toastTimeout = null;
 function $(selector) { return document.querySelector(selector); }
 function $$(selector) { return Array.from(document.querySelectorAll(selector)); }
 
+function cloneDefaults() { return JSON.parse(JSON.stringify(DEFAULTS)); }
+
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-    if (!saved || typeof saved !== 'object') return structuredClone(DEFAULTS);
+    if (!saved || typeof saved !== 'object') return cloneDefaults();
     return {
-      ...structuredClone(DEFAULTS),
+      ...cloneDefaults(),
       ...saved,
       tasks: Array.isArray(saved.tasks) ? saved.tasks : [],
       cards: Array.isArray(saved.cards) ? saved.cards : [],
@@ -35,7 +37,7 @@ function loadState() {
       timer: { ...DEFAULTS.timer, ...(saved.timer || {}) }
     };
   } catch (error) {
-    return structuredClone(DEFAULTS);
+    return cloneDefaults();
   }
 }
 
@@ -144,6 +146,7 @@ function renderTasks() {
   });
   const openCount = state.tasks.filter(function (task) { return !task.done; }).length;
   $('#taskListCount').textContent = openCount + ' open · ' + state.tasks.length + ' total';
+  $('#dashboardOpenCount').textContent = openCount + ' open · ' + state.tasks.length + ' total';
   $('#statOpenTasks').textContent = String(openCount);
   $('#statTaskHint').textContent = state.tasks.filter(function (task) { return task.done; }).length + ' completed so far';
 }
@@ -187,6 +190,7 @@ function renderMetrics() {
   $('#sidebarTargetMinutes').textContent = String(target);
   $('#sidebarProgress').style.width = pct + '%';
   $('#sidebarProgress').parentElement.setAttribute('aria-label', pct + '% of daily focus goal');
+  $('#focusTodayMini').textContent = String(minutes);
   $('#focusSessionMinutes').textContent = String(minutes);
   $('#focusSessionCount').textContent = String(state.sessions.filter(function (session) { return todayKey(session.at) === todayKey(new Date()); }).length);
   const completed = state.cards.reduce(function (n, card) { return n + (Number(card.mastery) || 0); }, 0);
@@ -433,7 +437,7 @@ function importData(file) {
       }
       if (!window.confirm('Import this backup and replace the current StudySync Hub data on this device?')) return;
       state = {
-        ...structuredClone(DEFAULTS),
+        ...cloneDefaults(),
         ...imported,
         tasks: imported.tasks,
         cards: imported.cards,
@@ -481,7 +485,7 @@ function resetAllData() {
   if (!confirmed) return;
   if (timerInterval) window.clearInterval(timerInterval);
   timerInterval = null;
-  state = structuredClone(DEFAULTS);
+  state = cloneDefaults();
   taskFilter = 'all';
   reviewIndex = 0;
   cardRevealed = false;
@@ -706,8 +710,9 @@ $('#cancelEditNote').addEventListener('click', function () {
 $$('[data-view]').forEach(function (button) {
   button.addEventListener('click', function () { setView(button.dataset.view); });
 });
-$$('[data-jump]').forEach(function (button) {
-  button.addEventListener('click', function () { setView(button.dataset.jump); });
+document.addEventListener('click', function (event) {
+  const button = event.target.closest('[data-jump]');
+  if (button) setView(button.dataset.jump);
 });
 
 $('#globalSearch').addEventListener('input', function () {
